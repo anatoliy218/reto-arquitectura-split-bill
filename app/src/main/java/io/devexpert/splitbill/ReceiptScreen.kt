@@ -49,10 +49,10 @@ fun ReceiptScreen(
 
     // Estados para manejar las cantidades seleccionadas y items pagados
     var selectedQuantities by remember {
-        mutableStateOf(ticketData.items.associate { item -> item to 0 })
+        mutableStateOf(ticketData.items.associateWith { item -> 0 })
     }
     var paidQuantities by remember {
-        mutableStateOf(ticketData.items.associate { item -> item to 0 })
+        mutableStateOf(ticketData.items.associateWith { item -> 0 })
     }
 
     // Calcular total seleccionado
@@ -149,7 +149,7 @@ fun ReceiptScreen(
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "€${String.format(Locale.getDefault(), "%.2f", selectedTotal)}",
+                            text = "€${String.format(Locale.getDefault(),"%.2f", selectedTotal)}",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -238,7 +238,7 @@ fun SelectableTicketItemCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "€${String.format(Locale.getDefault(), "%.2f", item.price)} ${stringResource(R.string.each)}",
+                    text = "€${String.format(Locale.getDefault(),"%.2f", item.price)} ${stringResource(R.string.each)}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -352,7 +352,7 @@ fun PaidTicketItemCard(
                     textDecoration = TextDecoration.LineThrough
                 )
                 Text(
-                    text = "€${String.format(Locale.getDefault(), "%.2f", item.price)} ${stringResource(R.string.each)}",
+                    text = "€${String.format(Locale.getDefault(),"%.2f", item.price)} ${stringResource(R.string.each)}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textDecoration = TextDecoration.LineThrough

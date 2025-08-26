@@ -42,8 +42,8 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
+kotlin{
+    compilerOptions{
         jvmTarget = JvmTarget.JVM_11
     }
 }

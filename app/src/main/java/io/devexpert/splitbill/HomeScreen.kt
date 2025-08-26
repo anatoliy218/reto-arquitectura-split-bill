@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
 import java.io.File
-import io.devexpert.splitbill.BuildConfig
 import androidx.core.graphics.scale
 
 // El Composable principal de la pantalla de inicio
