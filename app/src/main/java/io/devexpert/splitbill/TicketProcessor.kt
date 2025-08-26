@@ -29,8 +29,7 @@ data class TicketData(
 
 class TicketProcessor(private val useMockData: Boolean = false) {
 
-    private val json = Json { ignoreUnknownKeys = true }
-    
+    private  val json = Json { ignoreUnknownKeys = true }
     companion object {
         private val MOCK_JSON = """
         {

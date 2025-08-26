@@ -5,11 +5,10 @@ package io.devexpert.splitbill
  */
 object TicketDataHolder {
     private var _ticketData: TicketData? = null
-
+    
     fun setTicketData(data: TicketData) {
         _ticketData = data
     }
-
+    
     fun getTicketData(): TicketData? = _ticketData
-
 } 

@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
 import java.io.File
-import io.devexpert.splitbill.BuildConfig
 import androidx.core.graphics.scale
 
 // El Composable principal de la pantalla de inicio
@@ -59,6 +58,7 @@ fun HomeScreen(
 
     // Coroutine scope para operaciones asíncronas
     val coroutineScope = rememberCoroutineScope()
+    //Si quitamos el useMockData para probar con un ticket real
     val ticketProcessor = remember { TicketProcessor(useMockData = BuildConfig.DEBUG) }
 
     var photoUri by remember { mutableStateOf<Uri?>(null) }
@@ -79,7 +79,6 @@ fun HomeScreen(
             val inputStream = context.contentResolver.openInputStream(photoUri!!)
             val bitmap = inputStream?.use { BitmapFactory.decodeStream(it) }
             if (bitmap != null) {
-                // Redimensionar antes de procesar
                 val resizedBitmap = resizeBitmapToMaxWidth(bitmap, 1280)
                 isProcessing = true
                 errorMessage = null

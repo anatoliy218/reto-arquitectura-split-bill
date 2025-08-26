@@ -65,5 +65,4 @@ class ScanCounter(private val context: Context) {
             }
         }
     }
-
 } 
