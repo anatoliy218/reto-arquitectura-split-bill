@@ -34,10 +34,13 @@ import androidx.core.content.FileProvider
 import kotlinx.coroutines.launch
 import java.io.File
 import androidx.core.graphics.scale
+import io.devexpert.splitbill.data.TicketRepository
+import io.devexpert.splitbill.domain.TicketData
 
 // El Composable principal de la pantalla de inicio
 @Composable
 fun HomeScreen(
+    ticketRepository: TicketRepository,
     modifier: Modifier = Modifier,
     onTicketProcessed: (TicketData) -> Unit
 ) {
@@ -58,7 +61,6 @@ fun HomeScreen(
 
     // Coroutine scope para operaciones asíncronas
     val coroutineScope = rememberCoroutineScope()
-    val ticketProcessor = remember { TicketProcessor(useMockData = BuildConfig.DEBUG) }
 
     var photoUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -84,21 +86,21 @@ fun HomeScreen(
                 errorMessage = null
                 // Procesar la imagen con IA
                 coroutineScope.launch {
-                    ticketProcessor.processTicketImage(resizedBitmap)
-                        .onSuccess { ticketData ->
-                            // Decrementar el contador solo si el procesamiento fue exitoso
-                            scanCounter.decrementScan()
-                            isProcessing = false
-                            // Llamar al callback para navegar a la siguiente pantalla
-                            onTicketProcessed(ticketData)
-                        }
-                        .onFailure { error ->
-                            errorMessage = context.getString(
-                                R.string.error_processing_ticket,
-                                error.message ?: ""
-                            )
-                            isProcessing = false
-                        }
+                    try {
+                        val ticketData= ticketRepository.processTicket(resizedBitmap)
+                                // Decrementar el contador solo si el procesamiento fue exitoso
+                                scanCounter.decrementScan()
+                                isProcessing = false
+                                // Llamar al callback para navegar a la siguiente pantalla
+                                onTicketProcessed(ticketData)
+
+                    }catch (error: Exception) {
+                        errorMessage = context.getString(
+                            R.string.error_processing_ticket,
+                            error.message ?: ""
+                        )
+                        isProcessing = false
+                    }
                 }
             } else {
                 errorMessage = context.getString(R.string.could_not_read_image)
