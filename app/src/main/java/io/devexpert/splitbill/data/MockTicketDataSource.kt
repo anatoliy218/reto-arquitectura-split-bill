@@ -1,15 +1,13 @@
 package io.devexpert.splitbill.data
 
 import android.util.Log
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 class MockTicketDataSource : TicketDataSource {
-    
+
     private val json = Json { ignoreUnknownKeys = true }
-    
+
     companion object {
         private val MOCK_JSON = """
         {
@@ -124,11 +122,19 @@ class MockTicketDataSource : TicketDataSource {
         }
         """.trimIndent()
     }
-    
-    override suspend fun processTicket(imageBytes: ByteArray): TicketData = withContext(Dispatchers.IO) {
-        Log.d("MockTicketDataSource", "Usando datos mock (imagen de ${imageBytes.size} bytes)...")
+
+    override suspend fun processTicket(image: ByteArray): TicketData {
+
+        Log.d("TicketProcessor", "Usando datos mock...")
+        // Simular un poco de delay para que parezca real
         delay(1500)
-        
-        json.decodeFromString<TicketData>(MOCK_JSON)
+
+        // Parsear los datos mock
+        return json.decodeFromString<TicketData>(MOCK_JSON)
+
     }
+
+
+
+
 }

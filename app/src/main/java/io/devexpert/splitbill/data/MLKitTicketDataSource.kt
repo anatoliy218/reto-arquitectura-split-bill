@@ -15,12 +15,12 @@ class MLKitTicketDataSource : TicketDataSource {
 
     private val json = Json { ignoreUnknownKeys = true }
 
-    override suspend fun processTicket(imageBytes: ByteArray): TicketData =
+    override suspend fun processTicket(image: ByteArray): TicketData =
         withContext(Dispatchers.IO) {
             try {
-                Log.d("MLKitTicketDataSource", "Procesando imagen de ${imageBytes.size} bytes...")
+                Log.d("MLKitTicketDataSource", "Procesando imagen de ${image.size} bytes...")
 
-                val bitmap = ImageConverter.toBitmap(imageBytes)
+                val bitmap = ImageConverter.toBitmap(image)
 
                 val jsonSchema = Schema.obj(
                     mapOf(

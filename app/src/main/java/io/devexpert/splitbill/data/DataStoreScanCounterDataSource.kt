@@ -16,22 +16,22 @@ import java.time.temporal.ChronoUnit
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "scan_counter")
 
 class DataStoreScanCounterDataSource(private val context: Context) : ScanCounterDataSource {
-    
+
     companion object {
         private val FIRST_USE_DATE_KEY = longPreferencesKey("first_use_date")
         private val SCANS_REMAINING_KEY = intPreferencesKey("scans_remaining")
         private const val MAX_SCANS_PER_MONTH = 5
     }
-    
+
     override val scansRemaining: Flow<Int> = context.dataStore.data.map { preferences ->
         preferences[SCANS_REMAINING_KEY] ?: MAX_SCANS_PER_MONTH
     }
-    
+
     override suspend fun initializeOrResetIfNeeded() {
         val preferences = context.dataStore.data.first()
         val firstUseDate = preferences[FIRST_USE_DATE_KEY]
         val currentDateEpoch = LocalDate.now().toEpochDay()
-        
+
         if (firstUseDate == null) {
             context.dataStore.edit { preferences ->
                 preferences[FIRST_USE_DATE_KEY] = currentDateEpoch
@@ -40,7 +40,7 @@ class DataStoreScanCounterDataSource(private val context: Context) : ScanCounter
         } else {
             val firstUse = LocalDate.ofEpochDay(firstUseDate)
             val monthsElapsed = ChronoUnit.MONTHS.between(firstUse, LocalDate.now())
-            
+
             if (monthsElapsed >= 1) {
                 context.dataStore.edit { preferences ->
                     preferences[FIRST_USE_DATE_KEY] = currentDateEpoch
@@ -49,7 +49,7 @@ class DataStoreScanCounterDataSource(private val context: Context) : ScanCounter
             }
         }
     }
-    
+
     override suspend fun decrementScan() {
         context.dataStore.edit { preferences ->
             val current = preferences[SCANS_REMAINING_KEY] ?: MAX_SCANS_PER_MONTH

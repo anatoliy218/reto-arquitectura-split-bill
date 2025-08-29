@@ -9,7 +9,7 @@ class TicketRepository(private val ticketDataSource: TicketDataSource) {
         _ticketData = result
         return result
     }
-    
+
     fun getTicketData(): TicketData? {
         return _ticketData
     }

@@ -1,9 +1,6 @@
 package io.devexpert.splitbill
 
 import androidx.compose.foundation.layout.*
-import io.devexpert.splitbill.data.TicketRepository
-import io.devexpert.splitbill.data.TicketData
-import io.devexpert.splitbill.data.TicketItem
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -20,6 +17,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.devexpert.splitbill.data.TicketRepository
+import io.devexpert.splitbill.domain_usercases.GetTicketDataUseCase
+import io.devexpert.splitbill.data.TicketItem
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,7 +28,9 @@ fun ReceiptScreen(
     ticketRepository: TicketRepository,
     onBackPressed: () -> Unit
 ) {
-    val ticketData = remember { ticketRepository.getTicketData() }
+
+    val getTicketDataUseCase = remember { GetTicketDataUseCase(ticketRepository) }
+    val ticketData = remember { getTicketDataUseCase() }
 
     if (ticketData == null) {
         // Si no hay datos, mostrar error y botón para volver
@@ -53,10 +55,10 @@ fun ReceiptScreen(
 
     // Estados para manejar las cantidades seleccionadas y items pagados
     var selectedQuantities by remember {
-        mutableStateOf(ticketData.items.associate { item -> item to 0 })
+        mutableStateOf(ticketData.items.associateWith { item -> 0 })
     }
     var paidQuantities by remember {
-        mutableStateOf(ticketData.items.associate { item -> item to 0 })
+        mutableStateOf(ticketData.items.associateWith { item -> 0 })
     }
 
     // Calcular total seleccionado
@@ -153,7 +155,7 @@ fun ReceiptScreen(
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = "€${String.format(Locale.getDefault(), "%.2f", selectedTotal)}",
+                            text = "€${String.format(Locale.getDefault(),"%.2f", selectedTotal)}",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -242,7 +244,7 @@ fun SelectableTicketItemCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "€${String.format(Locale.getDefault(), "%.2f", item.price)} ${stringResource(R.string.each)}",
+                    text = "€${String.format(Locale.getDefault(),"%.2f", item.price)} ${stringResource(R.string.each)}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -356,7 +358,7 @@ fun PaidTicketItemCard(
                     textDecoration = TextDecoration.LineThrough
                 )
                 Text(
-                    text = "€${String.format(Locale.getDefault(), "%.2f", item.price)} ${stringResource(R.string.each)}",
+                    text = "€${String.format(Locale.getDefault(),"%.2f", item.price)} ${stringResource(R.string.each)}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textDecoration = TextDecoration.LineThrough

@@ -1,5 +1,5 @@
 package io.devexpert.splitbill.data
 
 interface TicketDataSource {
-    suspend fun processTicket(imageBytes: ByteArray): TicketData
+    suspend fun processTicket(image: ByteArray): TicketData
 }

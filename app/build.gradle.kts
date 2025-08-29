@@ -72,7 +72,8 @@ dependencies {
     
     // DataStore
     implementation(libs.androidx.datastore.preferences)
-    
+    implementation(libs.androidx.camera.core)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

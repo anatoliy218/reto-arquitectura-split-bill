@@ -30,11 +30,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
-import io.devexpert.splitbill.data.TicketRepository
-import io.devexpert.splitbill.data.ScanCounterRepository
-import io.devexpert.splitbill.ui.ImageConverter
 import kotlinx.coroutines.launch
 import java.io.File
+import io.devexpert.splitbill.data.ScanCounterRepository
+import io.devexpert.splitbill.data.TicketRepository
+import io.devexpert.splitbill.domain_usercases.DecrementScanCounterUseCase
+import io.devexpert.splitbill.domain_usercases.GetScansRemainingUseCase
+import io.devexpert.splitbill.domain_usercases.InitializeOrResetScanCounterUseCase
+import io.devexpert.splitbill.domain_usercases.ProcessTicketUseCase
+import io.devexpert.splitbill.ui.ImageConverter
 
 // El Composable principal de la pantalla de inicio
 @Composable
@@ -45,13 +49,18 @@ fun HomeScreen(
     onTicketProcessed: () -> Unit
 ) {
     val context = LocalContext.current
-    
-    val scansLeft by scanCounterRepository.scansRemaining.collectAsState(initial = 0)
+
+    val processTicketUseCase = remember { ProcessTicketUseCase(ticketRepository) }
+    val getScansRemainingUseCase = remember { GetScansRemainingUseCase(scanCounterRepository) }
+    val initializeOrResetScanCounterUseCase = remember { InitializeOrResetScanCounterUseCase(scanCounterRepository) }
+    val decrementScanCounterUseCase = remember { DecrementScanCounterUseCase(scanCounterRepository) }
+
+    val scansLeft by getScansRemainingUseCase().collectAsState(initial = 0)
     val isButtonEnabled = scansLeft > 0
 
     // Inicializar o resetear si es necesario al cargar la pantalla
     LaunchedEffect(Unit) {
-        scanCounterRepository.initializeOrResetIfNeeded()
+        initializeOrResetScanCounterUseCase()
     }
 
     // Estado para mostrar el resultado del procesamiento
@@ -63,7 +72,6 @@ fun HomeScreen(
 
     var photoUri by remember { mutableStateOf<Uri?>(null) }
 
-
     // Launcher para capturar foto con la cámara (alta resolución)
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -72,19 +80,19 @@ fun HomeScreen(
             val inputStream = context.contentResolver.openInputStream(photoUri!!)
             val bitmap = inputStream?.use { BitmapFactory.decodeStream(it) }
             if (bitmap != null) {
+                // Redimensionar antes de procesar
                 isProcessing = true
                 errorMessage = null
-                // Convertir Bitmap a ByteArray y procesar con IA
+                // Procesar la imagen con IA
                 coroutineScope.launch {
                     try {
                         val imageBytes = ImageConverter.toResizedByteArray(bitmap)
-                        ticketRepository.processTicket(imageBytes)
-                        // Decrementar el contador solo si el procesamiento fue exitoso
-                        scanCounterRepository.decrementScan()
+                        processTicketUseCase(imageBytes)
+                        decrementScanCounterUseCase()
                         isProcessing = false
                         // Llamar al callback para navegar a la siguiente pantalla
                         onTicketProcessed()
-                    } catch (error: Exception) {
+                    }catch (error: Exception) {
                         errorMessage = context.getString(
                             R.string.error_processing_ticket,
                             error.message ?: ""
